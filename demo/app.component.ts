@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Location, LocationStrategy, HashLocationStrategy } from '@angular/common';
 import * as shape from 'd3-shape';
 
 import { colorSets } from '../src/utils/color-sets';
@@ -10,6 +11,7 @@ const weekdayName = new Intl.DateTimeFormat('en-us', { weekday: 'short' });
 
 @Component({
   selector: 'app',
+  providers: [Location, {provide: LocationStrategy, useClass: HashLocationStrategy}],
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./app.component.scss'],
   templateUrl: './app.component.html'
@@ -19,7 +21,7 @@ export class AppComponent implements OnInit {
   version = APP_VERSION;
 
   theme = 'dark';
-  chartType = 'bar-vertical';
+  chartType: string;
   chartGroups: any[];
   chart: any;
   realTimeData: boolean = false;
@@ -109,7 +111,7 @@ export class AppComponent implements OnInit {
   gaugeValue: number = 50; // linear gauge value
   gaugePreviousValue: number = 70;
 
-  constructor() {
+  constructor(public location: Location) {
     Object.assign(this, {
       single,
       multi,
@@ -136,7 +138,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.selectChart(this.chartType);
+    const state = this.location.path(true);
+    this.selectChart(state.length ? state : 'bar-vertical');
 
     setInterval(this.updateData.bind(this), 1000);
 
@@ -261,7 +264,8 @@ export class AppComponent implements OnInit {
   }
 
   selectChart(chartSelector) {
-    this.chartType = chartSelector;
+    this.chartType = chartSelector = chartSelector.replace('/', '');
+    this.location.replaceState(this.chartType);
 
     this.linearScale = this.chartType === 'line-chart' ||
       this.chartType === 'line-chart-with-ranges' ||
@@ -389,7 +393,7 @@ export class AppComponent implements OnInit {
       }
 
       calendarData.push({
-        name: `Week of ${monday.toLocaleDateString()}`,
+        name: monday.toString(),
         series
       });
     }
@@ -398,7 +402,7 @@ export class AppComponent implements OnInit {
   }
 
   calendarAxisTickFormatting(mondayString: string) {
-    const monday = new Date(mondayString.replace('Week of ', ''));
+    const monday = new Date(mondayString);
     const month = monday.getMonth();
     const day = monday.getDate();
     const year = monday.getFullYear();
