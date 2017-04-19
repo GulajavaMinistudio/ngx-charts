@@ -37,7 +37,7 @@ import { TooltipService } from '../tooltip';
         *ngIf="showLegend && legendType === 'legend'"
         class="chart-legend"
         [data]="legendOptions.domain"
-        [title]="legendTitle"
+        [title]="legendOptions.title"
         [colors]="legendOptions.colors"
         [height]="view[1]"
         [width]="legendWidth"
@@ -68,7 +68,6 @@ export class ChartComponent implements OnChanges {
   @Input() data;
   @Input() legendData;
   @Input() legendType: any;
-  @Input() legendTitle = 'Legend';
   @Input() colors: any;
   @Input() activeEntries: any[];
 
