@@ -158,7 +158,7 @@ export class AppComponent implements OnInit {
   salePrice = 100;
   personnelCost = 100;
 
-  mathText = '3 - 1.5*sin(x) + cos(2*x) - 2*abs(cos(x))';
+  mathText = '3 - 1.5*sin(x) + cos(2*x) - 1.5*abs(cos(x))';
   mathFunction: (o: any) => any;
 
   constructor(public location: Location) {
@@ -485,6 +485,14 @@ export class AppComponent implements OnInit {
       default:
         return c.value.toLocaleString();
     }
+  }
+
+  currencyFormatting(c) {
+    return `\$${Math.round(c.value).toLocaleString()}`;
+  }
+
+  gdpLabelFormatting(c) {
+    return `${c.label}<br/><small class="number-card-label">GDP Per Capita</small>`;
   }
 
   statusLabelFormat(c): string {
