@@ -39,8 +39,8 @@ import {
       (deactivate)="deactivate.emit($event)"
       ngx-tooltip
       [tooltipDisabled]="tooltipDisabled"
-      [tooltipPlacement]="'top'"
-      [tooltipType]="'tooltip'"
+      [tooltipPlacement]="tooltipPlacement"
+      [tooltipType]="tooltipType"
       [tooltipTitle]="tooltipTemplate ? undefined : bar.tooltipText"
       [tooltipTemplate]="tooltipTemplate"
       [tooltipContext]="bar.data">
@@ -74,16 +74,21 @@ export class SeriesHorizontal implements OnChanges {
   @Input() activeEntries: any[];
   @Input() seriesName: string;
   @Input() tooltipTemplate: TemplateRef<any>;
+  @Input() roundEdges: boolean;
 
   @Output() select = new EventEmitter();
   @Output() activate = new EventEmitter();
   @Output() deactivate = new EventEmitter();
+
+  tooltipPlacement: string;
+  tooltipType: string;
 
   ngOnChanges(changes: SimpleChanges): void {
     this.update();
   }
 
   update(): void {
+    this.updateTooltipSettings();
     let d0 = 0;
     let total;
     if (this.type === 'normalized') {
@@ -94,7 +99,7 @@ export class SeriesHorizontal implements OnChanges {
       let value = d.value;
       const label = d.name;
       const formattedLabel = formatLabel(label);
-      const roundEdges = this.type === 'standard';
+      const roundEdges = this.roundEdges;
 
       const bar: any = {
         value,
@@ -163,13 +168,18 @@ export class SeriesHorizontal implements OnChanges {
         bar.data.series = this.seriesName;
       }
 
-      bar.tooltipText = `
+      bar.tooltipText = this.tooltipDisabled ? undefined : `
         <span class="tooltip-label">${tooltipLabel}</span>
         <span class="tooltip-val">${value.toLocaleString()}</span>
       `;
 
       return bar;
     });
+  }
+
+  updateTooltipSettings() {
+    this.tooltipPlacement = this.tooltipDisabled ? undefined : 'top';
+    this.tooltipType =  this.tooltipDisabled ? undefined : 'tooltip';
   }
 
   isActive(entry): boolean {
